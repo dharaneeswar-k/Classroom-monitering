@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Smart Classroom AI</title>
+    <meta name="description" content="Login to Smart Classroom AI as a Student, Faculty, or Admin.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+    <div class="login-page-wrap">
+
+        <!-- ── Left: Brand Panel ── -->
+        <div class="login-brand-panel">
+            <div class="brand-top">
+                <div class="brand-logo">
+                    <span class="brand-logo-name">Smart Classroom</span>
+                </div>
+                <div class="brand-headline">Attendance that runs<br>itself. Insights that<br>drive results.</div>
+                <p class="brand-sub">AI-powered face recognition monitors your classroom in real time — so you can focus
+                    on teaching, not registers.</p>
+            </div>
+            <div class="brand-bottom">
+                <div class="brand-badges">
+                    <div class="brand-badge">
+                        <div class="brand-badge-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <span>Secure JWT Authentication</span>
+                    </div>
+                    <div class="brand-badge">
+                        <div class="brand-badge-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                            </svg>
+                        </div>
+                        <span>Real-Time AI Processing</span>
+                    </div>
+                    <div class="brand-badge">
+                        <div class="brand-badge-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="22 12 16 12 13 21 7 3 4 12 2 12" />
+                            </svg>
+                        </div>
+                        <span>Cloud-Ready Architecture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Right: Form Panel ── -->
+        <div class="login-form-panel">
+            <div class="form-panel-header">
+                <h2>Welcome Back</h2>
+                <p>Select your role and sign in to continue</p>
+            </div>
+
+            <!-- Role Selector -->
+            <p class="role-tabs-label">Select Your Role</p>
+            <div class="role-tabs">
+                <button class="role-tab-btn active" id="tab-student" onclick="selectRole('student')">
+                    <span class="tab-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                        </svg>
+                    </span>
+                    Student
+                </button>
+                <button class="role-tab-btn" id="tab-faculty" onclick="selectRole('faculty')">
+                    <span class="tab-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M20 21a8 8 0 1 0-16 0" />
+                            <line x1="12" y1="13" x2="12" y2="17" />
+                            <line x1="10" y1="15" x2="14" y2="15" />
+                        </svg>
+                    </span>
+                    Faculty
+                </button>
+                <button class="role-tab-btn" id="tab-admin" onclick="selectRole('admin')">
+                    <span class="tab-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </span>
+                    Admin
+                </button>
+            </div>
+
+            <!-- Error -->
+            <div id="error-msg"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+
+                <div class="login-field">
+                    <label for="identifier" id="id-label">Roll Number / Register ID</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M20 21a8 8 0 1 0-16 0" />
+                            </svg>
+                        </span>
+                        <input type="text" id="identifier" class="login-input" required
+                            placeholder="Enter your ID or email" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <div class="field-row">
+                        <label for="password">Password</label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </span>
+                        <input type="password" id="password" class="login-input" required placeholder="••••••••"
+                            autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="login-submit" id="submitBtn">
+                    <span id="btn-text">Sign In</span>
+                    <span id="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <p class="form-footer-note">
+                Don't have an account? <a href="#">Contact your Administrator</a>
+            </p>
+        </div>
+    </div>
+    <script src="js/login.js"></script>
+</body>
+
+</html>

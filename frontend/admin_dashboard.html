@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Classroom - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <div class="dashboard-layout fade-in">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                Smart Classroom
+            </div>
+            <div class="sidebar-item active" onclick="switchTab('classrooms')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 9h18M9 21V9" />
+                </svg>
+                Classrooms
+            </div>
+            <div class="sidebar-item" onclick="switchTab('cameras')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                </svg>
+                Cameras
+            </div>
+            <div class="sidebar-item" onclick="switchTab('users')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Users & Roles
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-navbar">
+                <h2 id="pageTitle" style="color: var(--text-main); font-weight: 600;">System Overview</h2>
+                <div class="user-profile">
+                    <span id="userNameDisplay" style="font-weight: 500; color: var(--text-muted);">Admin</span>
+                    <div class="user-avatar">AD</div>
+                    <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
+                </div>
+            </div>
+
+            <!-- Classrooms Tab -->
+            <div id="tab-classrooms" class="tab-content animate-fade-in">
+                <div class="panel">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="header-action" style="margin-bottom: 0;">
+                            <div>
+                                <h3>Manage Classrooms</h3>
+                                <p style="color: var(--text-muted); font-size: 0.875rem;">Create and organize physical
+                                    spaces.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="openClassroomModal()">+ Add
+                                Classroom</button>
+                        </div>
+                    </div>
+                    <div class="table-container"
+                        style="border: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                        <table class="data-table" id="classroomTable">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Year</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cameras Tab -->
+            <div id="tab-cameras" class="tab-content hidden animate-fade-in">
+                <div class="panel">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="header-action" style="margin-bottom: 0;">
+                            <div>
+                                <h3>Camera Registration</h3>
+                                <p style="color: var(--text-muted); font-size: 0.875rem;">Map IP streams to physical
+                                    classrooms.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="openCameraModal()">+ Register
+                                Camera</button>
+                        </div>
+                    </div>
+                    <div class="table-container"
+                        style="border: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                        <table class="data-table" id="cameraTable">
+                            <thead>
+                                <tr>
+                                    <th>Identifier</th>
+                                    <th>Stream URL</th>
+                                    <th>Assigned Room</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="tab-content hidden animate-fade-in">
+                <div class="panel">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="header-action" style="margin-bottom: 0;">
+                            <div>
+                                <h3>User Directory</h3>
+                                <p style="color: var(--text-muted); font-size: 0.875rem;">Manage Faculty, Students, and
+                                    Admins across the system.</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-primary" onclick="openUserModal(null, 'student')">+ Provision
+                                    Student</button>
+                                <button class="btn btn-secondary" onclick="openUserModal(null, 'faculty')">+ Provision
+                                    Faculty / Admin</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container"
+                        style="border: none; border-radius: 0 0 var(--radius-lg) var(--radius-lg);">
+                        <table class="data-table" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Identifier (Email/Reg)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="classroomModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="classroomModalTitle">Add Classroom</h3>
+                <button class="close-btn" onclick="closeModal('classroomModal')">✕</button>
+            </div>
+            <form id="classroomForm">
+                <div class="form-group">
+                    <label class="form-label">Room Name / ID</label>
+                    <input type="text" id="crName" class="form-control" placeholder="e.g. CSCA, Room 101" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" id="crDept" class="form-control" placeholder="e.g. Computer Science" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Year Grouping</label>
+                    <input type="number" id="crYear" class="form-control" placeholder="e.g. 2" required>
+                </div>
+                <div class="form-group" id="crStatusGroup" style="display:none;">
+                    <label class="form-label">Status</label>
+                    <select id="crStatus" class="form-control">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;"
+                        onclick="closeModal('classroomModal')">Cancel</button>
+                    <button type="submit" id="classroomSubmitBtn" class="btn btn-primary" style="flex: 1;">Save
+                        Classroom</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cameraModalTitle">Register Camera</h3>
+                <button class="close-btn" onclick="closeModal('cameraModal')">✕</button>
+            </div>
+            <form id="cameraForm">
+                <div class="form-group">
+                    <label class="form-label">Camera Identifier</label>
+                    <input type="text" id="camName" class="form-control" placeholder="e.g. CAM-FRONT-01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">RTSP Video Stream URL</label>
+                    <input type="text" id="camUrl" class="form-control" placeholder="rtsp://admin:pass@ip:port/stream"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assign to Classroom</label>
+                    <select id="camClassroom" class="form-control" required>
+                        <option value="">Loading classrooms...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="camStatusGroup" style="display:none;">
+                    <label class="form-label">Status</label>
+                    <select id="camStatus" class="form-control">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;"
+                        onclick="closeModal('cameraModal')">Cancel</button>
+                    <button type="submit" id="cameraSubmitBtn" class="btn btn-primary" style="flex: 1;">Link
+                        Camera</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Provision New User</h3>
+                <button class="close-btn" onclick="closeModal('userModal')">✕</button>
+            </div>
+            <form id="userForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="uName" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">System Role</label>
+                    <select id="uRole" class="form-control" required onchange="toggleUserFields()" disabled>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group" id="uImageGroup" style="display:none;">
+                    <label class="form-label">Face Photograph (Required for AI Recognition)</label>
+                    <input type="file" id="uImage" class="form-control" accept="image/*">
+                </div>
+                <div class="form-group" id="uEmailGroup" style="display:none;">
+                    <label class="form-label">Email Address (Login)</label>
+                    <input type="email" id="uEmail" class="form-control" placeholder="email@school.edu">
+                </div>
+                <div class="form-group" id="uRegGroup">
+                    <label class="form-label">Register Number (Login)</label>
+                    <input type="text" id="uRegNo" class="form-control" placeholder="STD001">
+                </div>
+                <div class="form-group" id="uDeptDiv">
+                    <label class="form-label">Department / Major</label>
+                    <input type="text" id="uDept" class="form-control" placeholder="Computer Science">
+                </div>
+                <div class="form-group" id="uYearDiv">
+                    <label class="form-label">Academic Year</label>
+                    <input type="number" id="uYear" class="form-control" placeholder="1-4">
+                </div>
+
+                <!-- Advanced Faculty Assignment -->
+                <div class="form-group" id="uClassroomAssign">
+                    <label class="form-label">Initial Assigned Classroom</label>
+                    <select id="uInitialClassroom" class="form-control">
+                        <option value="">Loading...</option>
+                    </select>
+                    <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">For Faculty and Student
+                        relations.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Temporary Password</label>
+                    <input type="password" id="uPass" class="form-control" placeholder="Default is 12345">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;"
+                        onclick="closeModal('userModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Provision Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>

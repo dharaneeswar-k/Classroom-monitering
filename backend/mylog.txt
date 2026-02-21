@@ -1,0 +1,22 @@
+[dotenv@17.3.1] injecting env (4) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+MongoDB Connected: ac-3scs7ho-shard-00-00.fbayur4.mongodb.net
+Connected to DB for testing...
+Testing with Student: 6998583839726d3e46d4bbbe, Session: 6998583839726d3e46d4bbc2
+
+--- Test 1: Camera 1 Detects Yawning ---
+Status: present, Score: 95, Behaviors Count: 1
+✅ Passed Test 1
+
+--- Test 2: Camera 2 Detects Yawning Immediately (Sync Test) ---
+Status: present, Score: 95, Behaviors Count: 1
+✅ Passed Test 2 (Deduplicated successfully)
+
+--- Test 3: Camera 2 Detects Looking Away ---
+Status: present, Score: 92, Behaviors Count: 2
+✅ Passed Test 3
+
+--- Test 4: OD Status Override ---
+Status: od, Score: 92
+✅ Passed Test 4 (Ignored penalties due to OD)
+
+All tests complete.

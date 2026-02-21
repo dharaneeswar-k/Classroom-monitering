@@ -1,0 +1,5 @@
+ValidationError: User validation failed: registerNumber: Path `registerNumber` is required.
+    at Document.invalidate (D:\CODING STUFFS\Classroom-monitering\backend\node_modules\mongoose\lib\document.js:3381:32)
+    at D:\CODING STUFFS\Classroom-monitering\backend\node_modules\mongoose\lib\document.js:3142:17
+    at D:\CODING STUFFS\Classroom-monitering\backend\node_modules\mongoose\lib\schemaType.js:1446:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
