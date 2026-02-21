@@ -167,6 +167,10 @@ def ai_processing_thread(cam_info):
     
     print(f"[AI] Started processing for {cam_info['name']} ({cam_id})")
     
+    last_face_rec_time = 0
+    cached_detected_students = []
+    cached_new_boxes = []
+    
     while global_state["mocking_active"]:
         frame = global_state["raw_frames"].get(cam_id)
         if frame is None:
@@ -182,34 +186,42 @@ def ai_processing_thread(cam_info):
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         # 1. Face Recognition
-        small_frame = cv2.resize(rgb_frame, (0, 0), fx=0.5, fy=0.5)
-        face_locations = face_recognition.face_locations(small_frame, model="hog")
-        face_encodings = face_recognition.face_encodings(small_frame, face_locations)
-        
-        detected_students = []
-        new_boxes = []
-        for face_encoding, face_loc in zip(face_encodings, face_locations):
-            top, right, bottom, left = [coord * 2 for coord in face_loc]
+        # Run face recognition only once per second to reduce lag
+        if current_time - last_face_rec_time > 1.0:
+            small_frame = cv2.resize(rgb_frame, (0, 0), fx=0.25, fy=0.25)
+            face_locations = face_recognition.face_locations(small_frame, model="hog")
+            face_encodings = face_recognition.face_encodings(small_frame, face_locations)
             
-            matches = face_recognition.compare_faces(list(global_state["known_encodings"].values()), face_encoding, tolerance=0.50)
-            student_id = None
-            
-            if True in matches:
-                first_match_index = matches.index(True)
-                student_id = list(global_state["known_encodings"].keys())[first_match_index]
-                if student_id in session["students"]:
-                    detected_students.append(student_id)
-                    global_state["unseen_timers"][student_id] = current_time  # Reset absent timer
- 
-                    # Track first-seen time for participation 60% rule
-                    if student_id not in global_state["presence_start"]:
-                        global_state["presence_start"][student_id] = current_time
-                        print(f"[AI] First detection for {global_state['known_names'].get(student_id)} on {cam_info['name']}")
-            
-            name_display = global_state['known_names'].get(student_id, "Unknown!") if student_id else "Unknown"
-            new_boxes.append({"box": (top, right, bottom, left), "name": name_display})
-            
-        global_state["ai_boxes"][cam_id] = new_boxes
+            detected_students = []
+            new_boxes = []
+            for face_encoding, face_loc in zip(face_encodings, face_locations):
+                top, right, bottom, left = [coord * 4 for coord in face_loc]
+                
+                matches = face_recognition.compare_faces(list(global_state["known_encodings"].values()), face_encoding, tolerance=0.55)
+                student_id = None
+                
+                if True in matches:
+                    first_match_index = matches.index(True)
+                    student_id = list(global_state["known_encodings"].keys())[first_match_index]
+                    if student_id in session["students"]:
+                        detected_students.append(student_id)
+                        global_state["unseen_timers"][student_id] = current_time  # Reset absent timer
+     
+                        # Track first-seen time for participation 60% rule
+                        if student_id not in global_state["presence_start"]:
+                            global_state["presence_start"][student_id] = current_time
+                            print(f"[AI] First detection for {global_state['known_names'].get(student_id)} on {cam_info['name']}")
+                
+                name_display = global_state['known_names'].get(student_id, "Unknown!") if student_id else "Unknown"
+                new_boxes.append({"box": (top, right, bottom, left), "name": name_display})
+                
+            global_state["ai_boxes"][cam_id] = new_boxes
+            cached_detected_students = detected_students
+            cached_new_boxes = new_boxes
+            last_face_rec_time = current_time
+        else:
+            detected_students = cached_detected_students
+            global_state["ai_boxes"][cam_id] = cached_new_boxes
             
         # 2. Check 30s absent rule (Global check, but we only run it from ONE thread to avoid duplication)
         # We'll use the first camera in the session list as the 'authority' for absent marking
@@ -253,13 +265,14 @@ def ai_processing_thread(cam_info):
                 
                 top_head = face_landmarks.landmark[10]
                 chin = face_landmarks.landmark[152]
-                nose_bridge = face_landmarks.landmark[168]
-                upper_face_len = calc_distance(top_head, nose_bridge)
-                lower_face_len = calc_distance(nose_bridge, chin)
-                pitch_ratio = lower_face_len / (upper_face_len + 1e-6)
+                nose = face_landmarks.landmark[1]
                 
-                # If chin is closer to nose than top head is to nose, user is looking down at a phone
-                is_phone = pitch_ratio < 0.8
+                face_height = chin.y - top_head.y
+                nose_to_chin = chin.y - nose.y
+                
+                # Accurately detect looking down at a phone by checking face proportions 
+                # (nose gets closer to the chin when looking down)
+                is_phone = face_height > 0.05 and (nose_to_chin / face_height) < 0.28
                 
                 signals = {
                     "sleeping": is_sleeping,
